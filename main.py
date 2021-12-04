@@ -177,6 +177,7 @@ def make_reservation_for_slot_response(slot):
 
 def run():
     try:
+        print("Fetching availability")
         availability_response = get_availability_for_restaurant_id(RESTAURANT_ID)
         if 'suggestedAvailability' in availability_response:
             for day in availability_response['suggestedAvailability']:
