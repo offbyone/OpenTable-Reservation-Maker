@@ -1,6 +1,7 @@
 import json
 import os
 import pathlib
+import time
 from datetime import datetime
 from os.path import exists
 
@@ -30,6 +31,8 @@ headers = {
     'Authorization': f"Bearer {BEARER_TOKEN}",
     'User-Agent': 'com.contextoptional.OpenTable/15.2.0.16; iPhone; iOS/15.1.1; 3.0;',
 }
+
+cookies = {'OT-Session-Update-Date': str(int(time.time()))}
 
 
 def notify_of_reservation(reservation):
@@ -67,6 +70,7 @@ def get_availability_for_restaurant_id(id):
     }
 
     response = requests.put('https://mobile-api.opentable.com/api/v3/restaurant/availability', headers=headers,
+                            cookies=cookies,
                             data=json.dumps(data))
     return response.json()
 
@@ -88,7 +92,8 @@ def make_reservation_for_slot_response(slot):
     }
     print(f"Attempting to lock down reservation {slot_hash} at {slot_time}")
     response = requests.post(f'https://mobile-api.opentable.com/api/v1/reservation/{RESTAURANT_ID}/lock',
-                             headers=headers,
+                             headers=headers, cookies=cookies,
+
                              data=json.dumps(data))
     lock = response.json()
 
@@ -156,7 +161,7 @@ def make_reservation_for_slot_response(slot):
     }
     print(f"Attempting to complete reservation {lock_id}")
     final_booking_response = requests.post(
-        f"https://mobile-api.opentable.com/api/v1/reservation/{RESTAURANT_ID}",
+        f"https://mobile-api.opentable.com/api/v1/reservation/{RESTAURANT_ID}", cookies=cookies,
         headers=headers,
         data=json.dumps(complete_reservation_data))
 
