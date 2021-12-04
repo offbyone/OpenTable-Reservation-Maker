@@ -50,3 +50,11 @@ With an entry of
 
 You can set up your cron schedule how you'd like. I set mine up to check every
 minute, [but you can use this tool to configure yours](https://crontab.guru/every-1-minute).
+
+## Todo
+
+- [ ] Authentication endpoint so that you don't need to already have your bearer token and diner ID
+- [ ] Restaurant search so that you don't need to already know the ID of the restaurant you're looking for
+- [ ] Deletion endpoint (Not sure if this is useful? But maybe if this turns into an API)
+- [ ] Date exclusions - make it so that you can exclude specific dates that don't work
+- [ ] Support multiple restaurants being watched at the same time

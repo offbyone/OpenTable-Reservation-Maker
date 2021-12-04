@@ -1,4 +1,4 @@
-RESTAURANT_ID = 19306  # The restaurant ID
+RESTAURANT_ID = 211123  # The restaurant ID (currently Chefs Table at Brooklyn Fare
 MIN_HOUR = 17  # Earliest hour for your reservation, 24hr time
 MAX_HOUR = 23  # Latest hour for your reservation, 24hr time
 PARTY_SIZE = 2  # Number of people the reservation is for

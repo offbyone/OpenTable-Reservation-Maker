@@ -183,10 +183,15 @@ def run():
                 if 'timeslots' in day and len(day['timeslots']):
                     for slot in day['timeslots']:
                         slot_date = parse(slot['dateTime'])
+                        # todo - sort available dates by order of preference. if a big batch gets released and you have
+                        # 5pm to 11pm selected, you might get the 5pm even though the 8pm is preferable
                         if slot_date.hour >= MIN_HOUR and slot_date.hour <= MAX_HOUR:  # and slot_date.day >= MIN_DATE:
                             print(f"Found available time slot on {day['dateTime']}")
                             make_reservation_for_slot_response(slot)
                             return
+            print("No availability found")
+        else:
+            print("Error with response, unknown format")
     except Exception as e:
         print(e)
         pass
