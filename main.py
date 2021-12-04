@@ -1,4 +1,5 @@
 import json
+import logging
 import os
 import pathlib
 import time
@@ -29,7 +30,7 @@ if TWILIO_TOKEN and TWILIO_SID and TO_PHONE_NUMBER and FROM_PHONE_NUMBER:
 headers = {
     'Content-Type': 'application/json',
     'Authorization': f"Bearer {BEARER_TOKEN}",
-    'User-Agent': 'com.contextoptional.OpenTable/15.2.0.16; iPhone; iOS/15.1.1; 3.0;',
+    'User-Agent': 'com.context optional.OpenTable/15.2.0.16; iPhone; iOS/15.1.1; 3.0;',
 }
 
 cookies = {'OT-Session-Update-Date': str(int(time.time()))}
@@ -39,12 +40,12 @@ def notify_of_reservation(reservation):
     if not twilio_client:
         return
     body = f"Reservation for {reservation['restaurant']['name'][:20]} at {reservation['dateTime']} completed"
-    print(f"Sending text message: {body}")
+    logging.info(f"Sending text message: {body}")
     message = twilio_client.messages.create(
         to=TO_PHONE_NUMBER,
         from_=FROM_PHONE_NUMBER,
         body=body)
-    print(f"Sent text message: {message.sid}")
+    logging.info(f"Sent text message: {message.sid}")
 
 
 def get_availability_for_restaurant_id(id):
@@ -90,7 +91,7 @@ def make_reservation_for_slot_response(slot):
             "partnerId": "84"
         }
     }
-    print(f"Attempting to lock down reservation {slot_hash} at {slot_time}")
+    logging.info(f"Attempting to lock down reservation {slot_hash} at {slot_time}")
     response = requests.post(f'https://mobile-api.opentable.com/api/v1/reservation/{RESTAURANT_ID}/lock',
                              headers=headers, cookies=cookies,
 
@@ -98,7 +99,7 @@ def make_reservation_for_slot_response(slot):
     lock = response.json()
 
     lock_id = lock['id']
-    print(f"Successfully locked reservation with lock id {lock_id}")
+    logging.info(f"Successfully locked reservation with lock id {lock_id}")
     complete_reservation_data = {
         "diningFormOptIn": True,
         "partySize": PARTY_SIZE,
@@ -159,7 +160,7 @@ def make_reservation_for_slot_response(slot):
         },
         "dateTime": slot_time
     }
-    print(f"Attempting to complete reservation {lock_id}")
+    logging.info(f"Attempting to complete reservation {lock_id}")
     final_booking_response = requests.post(
         f"https://mobile-api.opentable.com/api/v1/reservation/{RESTAURANT_ID}", cookies=cookies,
         headers=headers,
@@ -169,12 +170,13 @@ def make_reservation_for_slot_response(slot):
     # We'll write this for the happy path, but welcome PRs cleaning this up
     final_booking_data = final_booking_response.json()
     if RESERVATION_FILENAME:
-        print("Saving reservation details to file...")
+        logging.info("Saving reservation details to file...")
         with open(RESERVATION_FILENAME, 'w') as reservation_out:
             reservation_out.write(final_booking_response.text)
             reservation_out.close()
-    print(f"Successfully made reservation {final_booking_data['id']} at {final_booking_data['restaurant']['name']}")
-    print(
+    logging.info(
+        f"Successfully made reservation {final_booking_data['id']} at {final_booking_data['restaurant']['name']}")
+    logging.info(
         f"Reservation token: {final_booking_data['token']} and confirmation number {final_booking_data['confirmationNumber']}")
     notify_of_reservation(final_booking_data)
     return final_booking_data
@@ -182,7 +184,7 @@ def make_reservation_for_slot_response(slot):
 
 def run():
     try:
-        print("Fetching availability")
+        logging.info("Fetching availability")
         availability_response = get_availability_for_restaurant_id(RESTAURANT_ID)
         if 'suggestedAvailability' in availability_response:
             for day in availability_response['suggestedAvailability']:
@@ -192,18 +194,28 @@ def run():
                         # todo - sort available dates by order of preference. if a big batch gets released and you have
                         # 5pm to 11pm selected, you might get the 5pm even though the 8pm is preferable
                         if slot_date.hour >= MIN_HOUR and slot_date.hour <= MAX_HOUR:  # and slot_date.day >= MIN_DATE:
-                            print(f"Found available time slot on {day['dateTime']}")
+                            logging.info(f"Found available time slot on {day['dateTime']}")
                             make_reservation_for_slot_response(slot)
                             return
-            print("No availability found")
+            logging.info("No availability found")
         else:
-            print("Error with response, unknown format")
+            logging.info("Error with response, unknown format")
     except Exception as e:
-        print(e)
+        logging.error(e)
         pass
 
 
-if not RESERVATION_FILENAME or not exists(f"{CURR_FILE_DIRECTORY}/{RESERVATION_FILENAME}"):
-    run()
-else:
-    print("Found an already existing reservation that was created. Delete ")
+if __name__ == "__main__":
+
+    logging.basicConfig(
+        level=logging.INFO,
+        format="%(asctime)s [%(levelname)s] %(message)s",
+        handlers=[
+            logging.FileHandler("opentable.log"),
+            logging.StreamHandler()
+        ]
+    )
+    if not RESERVATION_FILENAME or not exists(f"{CURR_FILE_DIRECTORY}/{RESERVATION_FILENAME}"):
+        run()
+    else:
+        logging.info("Found an already existing reservation that was created. Delete ")
