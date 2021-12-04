@@ -211,7 +211,7 @@ if __name__ == "__main__":
         level=logging.INFO,
         format="%(asctime)s [%(levelname)s] %(message)s",
         handlers=[
-            logging.FileHandler("opentable.log"),
+            logging.FileHandler(f"{CURR_FILE_DIRECTORY}/opentable.log"),
             logging.StreamHandler()
         ]
     )

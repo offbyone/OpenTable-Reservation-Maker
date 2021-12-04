@@ -45,8 +45,7 @@ You can set up whatever preferred running solution you like. I set mine up with 
 
 With an entry of
 
-`* * * * * /usr/bin/python3 /home/jonluca/opentable/main.py
-`
+`* * * * * /usr/bin/python3 /home/jonluca/opentable/main.py`
 
 You can set up your cron schedule how you'd like. I set mine up to check every
 minute, [but you can use this tool to configure yours](https://crontab.guru/every-1-minute).
