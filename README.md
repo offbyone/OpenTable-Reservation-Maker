@@ -21,7 +21,7 @@ Run the file
 
 ## Usage
 
-You must set up some environment variables first, and have some details about your OpenTable account before hand.
+You must set up some environment variables first, and have some details about your OpenTable account beforehand.
 
 | Variable             | Description                                                                                        | Required |
 |----------------------|----------------------------------------------------------------------------------------------------|----------|
@@ -57,3 +57,4 @@ minute, [but you can use this tool to configure yours](https://crontab.guru/ever
 - [ ] Deletion endpoint (Not sure if this is useful? But maybe if this turns into an API)
 - [ ] Date exclusions - make it so that you can exclude specific dates that don't work
 - [ ] Support multiple restaurants being watched at the same time
+- [ ] Support restaurants that require a credit card
