@@ -194,12 +194,12 @@ def run():
                         # todo - sort available dates by order of preference. if a big batch gets released and you have
                         # 5pm to 11pm selected, you might get the 5pm even though the 8pm is preferable
                         if slot_date.hour >= MIN_HOUR and slot_date.hour <= MAX_HOUR:  # and slot_date.day >= MIN_DATE:
-                            logging.info(f"Found available time slot on {day['dateTime']}")
+                            logging.warning(f"Found available time slot on {day['dateTime']}")
                             make_reservation_for_slot_response(slot)
                             return
             logging.info("No availability found")
         else:
-            logging.info("Error with response, unknown format")
+            logging.error("Error with response, unknown format")
     except Exception as e:
         logging.error(e)
         pass
